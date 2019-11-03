@@ -23,4 +23,28 @@ public class MethodInfo {
      * 返回类型
      */
     private ReturnInfo returnInfo;
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public List<ArgumentInfo> getArgumentInfoList() {
+        return argumentInfoList;
+    }
+
+    public void setArgumentInfoList(List<ArgumentInfo> argumentInfoList) {
+        this.argumentInfoList = argumentInfoList;
+    }
+
+    public ReturnInfo getReturnInfo() {
+        return returnInfo;
+    }
+
+    public void setReturnInfo(ReturnInfo returnInfo) {
+        this.returnInfo = returnInfo;
+    }
 }

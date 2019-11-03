@@ -2,6 +2,8 @@ package io.github.tanghuibo.classcanner.core.util;
 
 import io.github.tanghuibo.classcanner.core.bean.AnnotationInfo;
 import io.github.tanghuibo.classcanner.core.bean.ClassInfo;
+import io.github.tanghuibo.classcanner.core.bean.MethodInfo;
+import io.github.tanghuibo.classcanner.core.util.parse.membervalue.MethodInfoUtils;
 import javassist.CtClass;
 import javassist.bytecode.AnnotationsAttribute;
 import javassist.bytecode.AttributeInfo;
@@ -29,7 +31,12 @@ public class ClassInfoUtils {
         //设置type
         classInfo.setType(classFile.getName());
         classInfo.setAnnotationInfoList(getAnnotationInfoList(classFile));
+        classInfo.setMethodInfoList(getMethodInfoList(ctClass));
         return classInfo;
+    }
+
+    private static List<MethodInfo> getMethodInfoList(CtClass classFile) {
+        return Arrays.stream(classFile.getDeclaredMethods()).map(MethodInfoUtils::getMethodInfo).collect(Collectors.toList());
     }
 
     private static List<AnnotationInfo> getAnnotationInfoList(ClassFile classFile) {

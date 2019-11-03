@@ -14,11 +14,6 @@ public class ReturnInfo {
      */
     private String type;
 
-    /**
-     * 注解信息
-     */
-    private List<AnnotationInfo> annotationInfoList;
-
     public String getType() {
         return type;
     }
@@ -27,11 +22,4 @@ public class ReturnInfo {
         this.type = type;
     }
 
-    public List<AnnotationInfo> getAnnotationInfoList() {
-        return annotationInfoList;
-    }
-
-    public void setAnnotationInfoList(List<AnnotationInfo> annotationInfoList) {
-        this.annotationInfoList = annotationInfoList;
-    }
 }
