@@ -8,14 +8,12 @@ import javassist.CtClass;
 import javassist.CtMethod;
 import javassist.Modifier;
 import javassist.NotFoundException;
-import javassist.bytecode.AttributeInfo;
-import javassist.bytecode.CodeAttribute;
-import javassist.bytecode.ConstPool;
-import javassist.bytecode.LocalVariableAttribute;
+import javassist.bytecode.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author tanghuibo
@@ -27,21 +25,27 @@ public class MethodInfoUtils {
         result.setName(ctMethod.getName());
         try {
             result.setArgumentInfoList(getArgumentInfoList(ctMethod));
-        } catch (NotFoundException e) {
-            e.printStackTrace();
+        } catch (BadBytecode badBytecode) {
+            badBytecode.printStackTrace();
         }
         try {
             result.setReturnInfo(getReturnInfo(ctMethod));
-        } catch (NotFoundException e) {
-            e.printStackTrace();
+        } catch (BadBytecode badBytecode) {
+            badBytecode.printStackTrace();
         }
         return result;
     }
 
-    private static ReturnInfo getReturnInfo(CtMethod cm) throws NotFoundException {
+    private static ReturnInfo getReturnInfo(CtMethod cm) throws BadBytecode {
 
         ReturnInfo returnInfo = new ReturnInfo();
-        returnInfo.setType(cm.getReturnType().getName());
+        SignatureAttribute.MethodSignature methodSignature = getMethodSignature(cm.getMethodInfo());
+        if(methodSignature != null) {
+            if(methodSignature.getReturnType() != null) {
+                returnInfo.setType(methodSignature.getReturnType().jvmTypeName());
+            }
+
+        }
         return returnInfo;
     }
 
@@ -49,25 +53,47 @@ public class MethodInfoUtils {
 
 
 
-    private static List<ArgumentInfo> getArgumentInfoList(CtMethod cm) throws NotFoundException {
+    private static List<ArgumentInfo> getArgumentInfoList(CtMethod cm) throws BadBytecode {
         List<ArgumentInfo> resultList = new ArrayList<>();
         javassist.bytecode.MethodInfo methodInfo = cm.getMethodInfo();
         CodeAttribute codeAttribute = methodInfo.getCodeAttribute();
         if(codeAttribute == null) {
             return null;
         }
-        CtClass[] parameterTypes = cm.getParameterTypes();
-        int length = parameterTypes.length;
+        SignatureAttribute.MethodSignature methodSignature = getMethodSignature(methodInfo);
+        if(methodSignature == null) {
+            return resultList;
+        }
+        SignatureAttribute.Type[] parameterTypes = methodSignature.getParameterTypes();
         LocalVariableAttribute attr = (LocalVariableAttribute) codeAttribute.getAttribute(LocalVariableAttribute.tag);
+        List<String> params = getParamNames(attr);
         if (attr != null) {
-            int pos = Modifier.isStatic(cm.getModifiers()) ? 0 : 1;
+            int length = parameterTypes.length;
             for (int i = 0; i < length; i++) {
                 ArgumentInfo argumentInfo = new ArgumentInfo();
-                argumentInfo.setType(parameterTypes[i].getName());
-                argumentInfo.setName(attr.variableName(i + pos));
+                argumentInfo.setType(parameterTypes[i].jvmTypeName());
+                argumentInfo.setName(params.get(i));
                 resultList.add(argumentInfo);
             }
         }
         return resultList;
+    }
+
+    private static List<String> getParamNames(LocalVariableAttribute attr) {
+        int length = attr.tableLength();
+        List<String> resultList = new ArrayList<>();
+        for (int i = 0; i < length; i++) {
+            resultList.add(attr.variableName(i));
+        }
+        int thisIndex = resultList.indexOf("this");
+        if(thisIndex < 0) {
+            return resultList;
+        }
+        return resultList.stream().skip(thisIndex + 1).collect(Collectors.toList());
+    }
+
+    private static SignatureAttribute.MethodSignature getMethodSignature(javassist.bytecode.MethodInfo methodInfo) throws BadBytecode {
+
+        return SignatureAttribute.toMethodSignature(methodInfo.getDescriptor());
     }
 }
