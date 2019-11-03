@@ -19,7 +19,13 @@ import java.util.stream.Stream;
  */
 public class ClassScanUtils {
 
-    Predicate<ClassInfo> predicate = item -> true;
+    private ClassInfoUtils classInfoUtils = null;
+    private Predicate<ClassInfo> predicate = item -> true;
+
+    public ClassScanUtils(ClassInfoUtils classInfoUtils) {
+        this.classInfoUtils = classInfoUtils;
+    }
+
     public List<ClassInfo> scan(List<String> classPaths) {
         return classPaths.stream().flatMap(classPath -> scan(classPath).stream()).collect(Collectors.toList());
     }
@@ -55,7 +61,7 @@ public class ClassScanUtils {
                     String className = path.replace(File.separatorChar, '.');
                     ClassInfo classInfo = null;
                     try {
-                        classInfo = ClassInfoUtils.getClassInfo(classPool.getCtClass(className));
+                        classInfo = classInfoUtils.getClassInfo(classPool.getCtClass(className));
                     } catch (NotFoundException e) {
                         e.printStackTrace();
                     }

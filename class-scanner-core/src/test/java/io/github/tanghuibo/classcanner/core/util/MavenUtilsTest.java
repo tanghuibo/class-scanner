@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import io.github.tanghuibo.classcanner.core.bean.ClassInfo;
 import org.junit.Test;
 
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,7 +24,10 @@ public class MavenUtilsTest {
 
     @Test
     public void scan() {
-        ClassScanUtils classScanUtils = new ClassScanUtils();
+        ClassInfoUtils classInfoUtils = new ClassInfoUtils();
+        classInfoUtils.addBeforeFilter(item -> !item.getName().contains("$"));
+        classInfoUtils.addBeforeFilter(item -> Modifier.isPublic(item.getModifiers()));
+        ClassScanUtils classScanUtils = new ClassScanUtils(classInfoUtils);
         List<ClassInfo> scan = classScanUtils.scan(MavenUtils.scanClassPaths(BASE_CLASS));
         System.out.println(JSON.toJSONString(scan));
         assert scan.size() > 0;

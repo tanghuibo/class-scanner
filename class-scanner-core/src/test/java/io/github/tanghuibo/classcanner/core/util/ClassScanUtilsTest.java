@@ -17,7 +17,7 @@ public class ClassScanUtilsTest {
 
     @Test
     public void scanTest() {
-        ClassScanUtils classScanUtils = new ClassScanUtils();
+        ClassScanUtils classScanUtils = new ClassScanUtils(new ClassInfoUtils());
 
         List<ClassInfo> list = classScanUtils.scan(CLASS_PATH);
         System.out.println(JSON.toJSONString(list));
@@ -26,7 +26,7 @@ public class ClassScanUtilsTest {
 
     @Test
     public void filterTest() {
-        ClassScanUtils classScanUtils = new ClassScanUtils();
+        ClassScanUtils classScanUtils = new ClassScanUtils(new ClassInfoUtils());
         classScanUtils.addFilter(item -> "io.github.tanghuibo.classcanner.core.bean.ArgumentInfo".equals(item.getType()));
         List<ClassInfo> list = classScanUtils.scan(CLASS_PATH);
         System.out.println(JSON.toJSONString(list));
@@ -34,7 +34,7 @@ public class ClassScanUtilsTest {
 
     @Test
     public void scanListTest() {
-        ClassScanUtils classScanUtils = new ClassScanUtils();
+        ClassScanUtils classScanUtils = new ClassScanUtils(new ClassInfoUtils());
         List<ClassInfo> list = classScanUtils.scan(Arrays.asList(CLASS_PATH));
         System.out.println(JSON.toJSONString(list));
     }
