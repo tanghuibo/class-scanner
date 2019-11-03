@@ -61,22 +61,28 @@ public class MethodInfoUtils {
             return null;
         }
         SignatureAttribute.MethodSignature methodSignature = getMethodSignature(methodInfo);
-        if(methodSignature == null) {
-            return resultList;
-        }
         SignatureAttribute.Type[] parameterTypes = methodSignature.getParameterTypes();
         LocalVariableAttribute attr = (LocalVariableAttribute) codeAttribute.getAttribute(LocalVariableAttribute.tag);
-        List<String> params = getParamNames(attr);
         if (attr != null) {
+            List<String> params = getParamNames(attr);
             int length = parameterTypes.length;
             for (int i = 0; i < length; i++) {
                 ArgumentInfo argumentInfo = new ArgumentInfo();
                 argumentInfo.setType(parameterTypes[i].jvmTypeName());
-                argumentInfo.setName(params.get(i));
+                argumentInfo.setName(i < params.size() ? params.get(i) : getNewName(resultList));
                 resultList.add(argumentInfo);
             }
         }
         return resultList;
+    }
+
+    private static String getNewName(List<ArgumentInfo> resultList) {
+        List<String> nameList = resultList.stream().map(ArgumentInfo::getName).collect(Collectors.toList());
+        int i = 1;
+        while (nameList.contains("arg" + i)) {
+            i ++;
+        }
+        return "arg" + i;
     }
 
     private static List<String> getParamNames(LocalVariableAttribute attr) {
