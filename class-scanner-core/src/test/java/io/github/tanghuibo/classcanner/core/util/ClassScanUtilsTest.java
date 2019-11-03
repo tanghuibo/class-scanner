@@ -2,10 +2,9 @@ package io.github.tanghuibo.classcanner.core.util;
 
 import com.alibaba.fastjson.JSON;
 import io.github.tanghuibo.classcanner.core.bean.ClassInfo;
-import javassist.NotFoundException;
 import org.junit.Test;
 
-import java.io.File;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -17,13 +16,26 @@ public class ClassScanUtilsTest {
     final static String CLASS_PATH = "target/classes";
 
     @Test
-    public void scanTest() throws NotFoundException {
-        List<ClassInfo> list = ClassScanUtils.scan(CLASS_PATH);
+    public void scanTest() {
+        ClassScanUtils classScanUtils = new ClassScanUtils();
 
-        ClassInfo classInfo = list.stream().filter(item -> ClassScanUtils.class.getName().endsWith(item.getType()))
-                .findFirst().orElse(null);
+        List<ClassInfo> list = classScanUtils.scan(CLASS_PATH);
         System.out.println(JSON.toJSONString(list));
-        assert classInfo != null;
 
+    }
+
+    @Test
+    public void filterTest() {
+        ClassScanUtils classScanUtils = new ClassScanUtils();
+        classScanUtils.addFilter(item -> "io.github.tanghuibo.classcanner.core.bean.ArgumentInfo".equals(item.getType()));
+        List<ClassInfo> list = classScanUtils.scan(CLASS_PATH);
+        System.out.println(JSON.toJSONString(list));
+    }
+
+    @Test
+    public void scanListTest() {
+        ClassScanUtils classScanUtils = new ClassScanUtils();
+        List<ClassInfo> list = classScanUtils.scan(Arrays.asList(CLASS_PATH));
+        System.out.println(JSON.toJSONString(list));
     }
 }

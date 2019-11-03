@@ -8,6 +8,9 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * 类扫描工具
@@ -16,16 +19,24 @@ import java.util.List;
  */
 public class ClassScanUtils {
 
+    Predicate<ClassInfo> predicate = item -> true;
+    public List<ClassInfo> scan(List<String> classPaths) {
+        return classPaths.stream().flatMap(classPath -> scan(classPath).stream()).collect(Collectors.toList());
+    }
+
     /**
      * 扫描classInfo
      * @param classPath
      * @return
-     * @throws NotFoundException
      */
-    public static List<ClassInfo> scan(String classPath) throws NotFoundException {
+    public List<ClassInfo> scan(String classPath) {
         List<ClassInfo> resultList = new ArrayList<>();
         ClassPool classPool = ClassPool.getDefault();
-        classPool.insertClassPath(classPath);
+        try {
+            classPool.insertClassPath(classPath);
+        } catch (NotFoundException e) {
+            e.printStackTrace();
+        }
         List<File> fileList = Arrays.asList(new File(classPath).listFiles());
         while (fileList.size() != 0) {
             List<File> newFileList = fileList;
@@ -42,11 +53,26 @@ public class ClassScanUtils {
                     path = path.substring(classPath.length() + 1, path.length() - ".class".length());
                     //斜杠转成. => io/github/tanghuibo -> io.github.tanghuibo
                     String className = path.replace(File.separatorChar, '.');
-                    ClassInfo classInfo = ClassInfoUtils.getClassInfo(classPool.getCtClass(className));
-                    resultList.add(classInfo);
+                    ClassInfo classInfo = null;
+                    try {
+                        classInfo = ClassInfoUtils.getClassInfo(classPool.getCtClass(className));
+                    } catch (NotFoundException e) {
+                        e.printStackTrace();
+                    }
+                    Stream stream = null;
+
+                    if(predicate.test(classInfo)) {
+                        resultList.add(classInfo);
+                    }
+
                 }
             }
         }
         return resultList;
     }
+
+    public void addFilter(Predicate<ClassInfo> predicate) {
+        this.predicate = this.predicate.and(predicate);
+    }
+
 }
