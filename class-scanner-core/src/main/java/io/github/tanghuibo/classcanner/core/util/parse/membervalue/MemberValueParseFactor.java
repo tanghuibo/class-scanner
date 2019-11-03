@@ -20,6 +20,9 @@ public class MemberValueParseFactor {
         if(memberValue instanceof BooleanMemberValue) {
             return new BooleanMemberValueParseImpl();
         }
+        if(memberValue instanceof ClassMemberValue) {
+            return new ClassMemberValueParseImpl();
+        }
 
         if(memberValue instanceof StringMemberValue) {
             return new StringMemberValueParseImpl();
