@@ -1,17 +1,15 @@
 package io.github.tanghuibo.classcanner.core.util.parse.membervalue;
 
 
+import io.github.tanghuibo.classcanner.core.bean.AnnotationInfo;
 import io.github.tanghuibo.classcanner.core.bean.ArgumentInfo;
 import io.github.tanghuibo.classcanner.core.bean.MethodInfo;
 import io.github.tanghuibo.classcanner.core.bean.ReturnInfo;
-import javassist.CtClass;
+import io.github.tanghuibo.classcanner.core.util.AnnotationUtils;
 import javassist.CtMethod;
-import javassist.Modifier;
-import javassist.NotFoundException;
 import javassist.bytecode.*;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -24,16 +22,29 @@ public class MethodInfoUtils {
         MethodInfo result = new MethodInfo();
         result.setName(ctMethod.getName());
         try {
+            result.setAnnotationInfoList(getAnnotationInfoList(ctMethod));
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+        try {
             result.setArgumentInfoList(getArgumentInfoList(ctMethod));
-        } catch (BadBytecode badBytecode) {
-            badBytecode.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         try {
             result.setReturnInfo(getReturnInfo(ctMethod));
-        } catch (BadBytecode badBytecode) {
-            badBytecode.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         return result;
+    }
+
+    private static List<AnnotationInfo> getAnnotationInfoList(CtMethod ctMethod) {
+        List<AttributeInfo> attributes = ctMethod.getMethodInfo().getAttributes();
+        if(attributes == null) {
+            return new ArrayList<>(0);
+        }
+        return AnnotationUtils.getAnnotationInfoList(attributes);
     }
 
     private static ReturnInfo getReturnInfo(CtMethod cm) throws BadBytecode {
@@ -56,29 +67,42 @@ public class MethodInfoUtils {
     private static List<ArgumentInfo> getArgumentInfoList(CtMethod cm) throws BadBytecode {
         List<ArgumentInfo> resultList = new ArrayList<>();
         javassist.bytecode.MethodInfo methodInfo = cm.getMethodInfo();
-        CodeAttribute codeAttribute = methodInfo.getCodeAttribute();
-        if(codeAttribute == null) {
-            return null;
+        List<List<AnnotationInfo>> paramAnnotationInfoList
+                = AnnotationUtils.getParamAnnotationInfoList(methodInfo.getAttributes());
+        int paramAnnotationInfoListSize = 0;
+        if(paramAnnotationInfoList != null) {
+            paramAnnotationInfoListSize = paramAnnotationInfoList.size();
         }
+
         SignatureAttribute.MethodSignature methodSignature = getMethodSignature(methodInfo);
         SignatureAttribute.Type[] parameterTypes = methodSignature.getParameterTypes();
-        LocalVariableAttribute attr = (LocalVariableAttribute) codeAttribute.getAttribute(LocalVariableAttribute.tag);
-        if (attr != null) {
-            List<String> params = getParamNames(attr);
-            int length = parameterTypes.length;
-            for (int i = 0; i < length; i++) {
-                ArgumentInfo argumentInfo = new ArgumentInfo();
-                argumentInfo.setType(parameterTypes[i].jvmTypeName());
-                argumentInfo.setName(i < params.size() ? params.get(i) : getNewName(resultList));
-                resultList.add(argumentInfo);
+        CodeAttribute codeAttribute = methodInfo.getCodeAttribute();
+        List<String> params = getParams(codeAttribute);
+        int length = parameterTypes.length;
+        for (int i = 0; i < length; i++) {
+            ArgumentInfo argumentInfo = new ArgumentInfo();
+            argumentInfo.setType(parameterTypes[i].jvmTypeName());
+            argumentInfo.setName(i < params.size() ? params.get(i) : getNewName(resultList));
+            if(i < paramAnnotationInfoListSize) {
+                argumentInfo.setAnnotationInfoList(paramAnnotationInfoList.get(i));
             }
+            resultList.add(argumentInfo);
         }
+
         return resultList;
+    }
+
+    private static List<String> getParams(CodeAttribute codeAttribute) {
+        if(codeAttribute != null) {
+            LocalVariableAttribute attr = (LocalVariableAttribute) codeAttribute.getAttribute(LocalVariableAttribute.tag);
+            return getParamNames(attr);
+        }
+        return new ArrayList<>(0);
     }
 
     private static String getNewName(List<ArgumentInfo> resultList) {
         List<String> nameList = resultList.stream().map(ArgumentInfo::getName).collect(Collectors.toList());
-        int i = 1;
+        int i = 0;
         while (nameList.contains("arg" + i)) {
             i ++;
         }

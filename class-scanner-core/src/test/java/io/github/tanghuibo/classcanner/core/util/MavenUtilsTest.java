@@ -7,7 +7,6 @@ import org.junit.Test;
 
 import java.io.*;
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -16,7 +15,7 @@ import java.util.List;
  */
 public class MavenUtilsTest {
 
-    static final String BASE_CLASS = "../";
+    private static final String BASE_CLASS = "../";
     @Test
     public void scanClassPathsTest() {
         List<String> classPaths = MavenUtils.getClassPaths(MavenUtils.getAllModules(BASE_CLASS));

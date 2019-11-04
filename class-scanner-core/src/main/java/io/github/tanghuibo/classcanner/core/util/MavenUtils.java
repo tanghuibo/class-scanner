@@ -23,7 +23,7 @@ public class MavenUtils {
      * @throws JDOMException
      * @throws IOException
      */
-    static List<String> getModules(String path) throws JDOMException, IOException {
+    public static List<String> getModules(String path) throws JDOMException, IOException {
         String dirPath = (path.endsWith(File.separator) ? path : (path + File.separator));
         String pomPah = dirPath + "pom.xml";
         if(!new File(pomPah).exists()) {
@@ -52,7 +52,7 @@ public class MavenUtils {
      * @param path
      * @return
      */
-    static List<String> getAllModules(String path) {
+    public static List<String> getAllModules(String path) {
         List<String> newList = new ArrayList<>(0);
         List<String> resultList = new ArrayList<>(0);
         try {
@@ -85,8 +85,19 @@ public class MavenUtils {
      * @return
      */
     public static List<String> getClassPaths(List<String> modulePaths) {
+        return getDirectorys(modulePaths, "target" + File.separator + "classes");
+    }
+
+    /**
+     * 获取文件夹
+     * @param modulePaths
+     * @param dirPath 文件夹路径
+     * @return
+     */
+    public static List<String> getDirectorys(List<String> modulePaths, String dirPath) {
         return modulePaths.stream()
-                .map(item -> (item.endsWith(File.separator) ? item : item + File.separator) + "target/classes")
+                .map(item -> (item.endsWith(File.separator) ? item : item + File.separator)
+                        + dirPath)
                 .filter(item -> new File(item).isDirectory()).collect(Collectors.toList());
     }
 }

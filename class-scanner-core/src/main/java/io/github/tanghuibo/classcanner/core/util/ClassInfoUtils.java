@@ -6,12 +6,10 @@ import io.github.tanghuibo.classcanner.core.bean.MethodInfo;
 import io.github.tanghuibo.classcanner.core.util.parse.membervalue.MethodInfoUtils;
 import javassist.CtClass;
 import javassist.CtMethod;
-import javassist.bytecode.AnnotationsAttribute;
 import javassist.bytecode.AttributeInfo;
 import javassist.bytecode.ClassFile;
 
 import java.util.Arrays;
-import java.util.BitSet;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -23,7 +21,14 @@ import java.util.stream.Collectors;
  */
 public class ClassInfoUtils {
 
+    /**
+     * 后置过滤器
+     */
     private Predicate<MethodInfo> afterPredicate = item -> true;
+
+    /**
+     * 前置过滤器
+     */
     private Predicate<CtMethod> beforePredicate = item -> true;
 
     /**
@@ -41,6 +46,22 @@ public class ClassInfoUtils {
         return classInfo;
     }
 
+    /**
+     * 添加后置过滤器
+     * @param predicate
+     */
+    public void addAfterFilter(Predicate<MethodInfo> predicate) {
+        this.afterPredicate = this.afterPredicate.and(predicate);
+    }
+
+    /**
+     * 添加前置过滤器
+     * @param predicate
+     */
+    public void addBeforeFilter(Predicate<CtMethod> predicate) {
+        this.beforePredicate = this.beforePredicate.and(predicate);
+    }
+
     private  List<MethodInfo> getMethodInfoList(CtClass classFile) {
         return Arrays.stream(classFile.getDeclaredMethods()).filter(beforePredicate::test)
                 .map(MethodInfoUtils::getMethodInfo).filter(afterPredicate::test).collect(Collectors.toList());
@@ -52,24 +73,7 @@ public class ClassInfoUtils {
     }
 
     private  List<AnnotationInfo> getAnnotationInfoList(List<AttributeInfo> attributes) {
-        return attributes.stream()
-                //过滤非注解信息
-                .filter(attribute -> attribute instanceof AnnotationsAttribute)
-                .flatMap(attribute -> {
-                    AnnotationsAttribute annotationsAttribute = (AnnotationsAttribute) attribute;
-                    return Arrays.stream(annotationsAttribute.getAnnotations());
-                })
-                .map(AnnotationUtils::toAnnotationInfo)
-                .collect(Collectors.toList());
+        return AnnotationUtils.getAnnotationInfoList(attributes);
     }
-
-    public void addAfterFilter(Predicate<MethodInfo> predicate) {
-        this.afterPredicate = this.afterPredicate.and(predicate);
-    }
-
-    public void addBeforeFilter(Predicate<CtMethod> predicate) {
-        this.beforePredicate = this.beforePredicate.and(predicate);
-    }
-
 
 }

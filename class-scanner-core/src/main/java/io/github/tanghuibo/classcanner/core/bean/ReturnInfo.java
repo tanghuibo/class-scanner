@@ -1,7 +1,5 @@
 package io.github.tanghuibo.classcanner.core.bean;
 
-import java.util.List;
-
 /**
  * 返回类型
  * @author tanghuibo

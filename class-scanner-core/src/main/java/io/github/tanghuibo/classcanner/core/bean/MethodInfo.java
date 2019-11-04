@@ -20,6 +20,11 @@ public class MethodInfo {
     private List<ArgumentInfo> argumentInfoList;
 
     /**
+     * 注解
+     */
+    private List<AnnotationInfo> annotationInfoList;
+
+    /**
      * 返回类型
      */
     private ReturnInfo returnInfo;
@@ -46,5 +51,13 @@ public class MethodInfo {
 
     public void setReturnInfo(ReturnInfo returnInfo) {
         this.returnInfo = returnInfo;
+    }
+
+    public List<AnnotationInfo> getAnnotationInfoList() {
+        return annotationInfoList;
+    }
+
+    public void setAnnotationInfoList(List<AnnotationInfo> annotationInfoList) {
+        this.annotationInfoList = annotationInfoList;
     }
 }

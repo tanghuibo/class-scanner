@@ -2,12 +2,14 @@ package io.github.tanghuibo.classcanner.core.util;
 
 import io.github.tanghuibo.classcanner.core.bean.AnnotationInfo;
 import io.github.tanghuibo.classcanner.core.util.parse.membervalue.MemberValueParseUtil;
+import javassist.bytecode.AnnotationsAttribute;
+import javassist.bytecode.AttributeInfo;
+import javassist.bytecode.ParameterAnnotationsAttribute;
 import javassist.bytecode.annotation.Annotation;
 import javassist.bytecode.annotation.MemberValue;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 注解工具
@@ -44,5 +46,42 @@ public class AnnotationUtils {
         return paramMap;
     }
 
+    /**
+     * 获取类或方法注解信息
+     * @param attributes
+     * @return
+     */
+    public static List<AnnotationInfo> getAnnotationInfoList(List<AttributeInfo> attributes) {
+        if(attributes == null) {
+            return new ArrayList<>(0);
+        }
+        return attributes.stream()
+                //过滤非注解信息
+                .filter(attribute -> attribute instanceof AnnotationsAttribute)
+                .flatMap(attribute -> {
+                    AnnotationsAttribute annotationsAttribute = (AnnotationsAttribute) attribute;
+                    return Arrays.stream(annotationsAttribute.getAnnotations());
+                })
+                .map(AnnotationUtils::toAnnotationInfo)
+                .collect(Collectors.toList());
+    }
 
+
+    public static List<List<AnnotationInfo>> getParamAnnotationInfoList(List<AttributeInfo> attributes) {
+        if(attributes == null) {
+            return new ArrayList<>(0);
+        }
+        ParameterAnnotationsAttribute parameterAnnotationsAttribute =
+                attributes.stream().filter(attribute -> attribute instanceof ParameterAnnotationsAttribute)
+                        .map(attributeInfo -> (ParameterAnnotationsAttribute) attributeInfo)
+                        .findFirst().orElse(null);
+        if(parameterAnnotationsAttribute == null) {
+            return new ArrayList(0);
+        }
+        return Arrays.stream(parameterAnnotationsAttribute.getAnnotations()).map(
+                annotations -> Arrays.stream(annotations).map(AnnotationUtils::toAnnotationInfo).collect(Collectors.toList())
+        ).collect(Collectors.toList());
+
+
+    }
 }

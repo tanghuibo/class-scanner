@@ -18,6 +18,11 @@ public class ArgumentInfo {
      */
     private String type;
 
+    /**
+     * 注解
+     */
+    private List<AnnotationInfo> annotationInfoList;
+
     public String getName() {
         return name;
     }
@@ -32,5 +37,13 @@ public class ArgumentInfo {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public List<AnnotationInfo> getAnnotationInfoList() {
+        return annotationInfoList;
+    }
+
+    public void setAnnotationInfoList(List<AnnotationInfo> annotationInfoList) {
+        this.annotationInfoList = annotationInfoList;
     }
 }
