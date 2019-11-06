@@ -15,7 +15,7 @@ import java.util.List;
  */
 public class MavenUtilsTest {
 
-    private static final String BASE_CLASS = "../";
+    private static final String BASE_CLASS = ".." + File.separator;
     @Test
     public void scanClassPathsTest() {
         List<String> classPaths = MavenUtils.getClassPaths(MavenUtils.getAllModules(BASE_CLASS));

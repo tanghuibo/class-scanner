@@ -4,9 +4,12 @@ import com.sun.javadoc.ClassDoc;
 import com.sun.javadoc.RootDoc;
 import io.github.tanghuibo.classcanner.core.bean.JavaDocInfo;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author tanghuibo
@@ -29,17 +32,25 @@ public class JavaDocUtils {
      * @return
      */
     public static synchronized List<JavaDocInfo> scan(String sourcePath) {
+        String[] commandList = getCommand(sourcePath);
         com.sun.tools.javadoc.Main.execute(
-                new String[] {
-                        "-doclet",
-                        JavaDocUtils.class.getName(),
-                        "-encoding", "utf-8",
-                        "-sourcepath",
-                        sourcePath
-                }
+                commandList
         );
         ClassDoc[] classes = rootDoc.classes();
         return Arrays.stream(classes).map(JavaDocUtils::getJavaDocInfo).collect(Collectors.toList());
+    }
+
+    private static String[] getCommand(String sourcePath) {
+        List<String> commandList = Arrays.stream(new String[]{
+                "-doclet",
+                JavaDocUtils.class.getName(),
+                "-encoding", "utf-8",
+                "-sourcepath", sourcePath
+        }).collect(Collectors.toList());
+        commandList.addAll(Arrays.stream(new File(sourcePath).list())
+                .flatMap(item -> Stream.of("-subpackages", item))
+                .collect(Collectors.toList()));
+        return commandList.toArray(new String[0]);
     }
 
     /**
