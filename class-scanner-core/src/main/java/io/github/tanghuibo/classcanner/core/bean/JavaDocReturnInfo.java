@@ -1,16 +1,11 @@
 package io.github.tanghuibo.classcanner.core.bean;
 
 /**
- * JavaDoc参数信息
+ * javaDoc返回信息
  * @author tanghuibo
- * @date 19-11-6下午11:55
+ * @date 19-11-7下午11:57
  */
-public class JavaDocArgumentInfo {
-
-    /**
-     * 名称
-     */
-    private String name;
+public class JavaDocReturnInfo {
 
     /**
      * 类型
@@ -21,14 +16,6 @@ public class JavaDocArgumentInfo {
      * 注释
      */
     private String commentText;
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
 
     public String getType() {
         return type;

@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 方法doc
+ * JavaDoc方法信息
  * @author tanghuibo
  * @date 19-11-6下午11:54
  */
@@ -32,7 +32,7 @@ public class JavaDocMethodInfo {
     /**
      * 返回值信息
      */
-    private JavaDocArgumentInfo returnInfo;
+    private JavaDocReturnInfo returnInfo;
 
     public String getName() {
         return name;
@@ -66,11 +66,11 @@ public class JavaDocMethodInfo {
         this.argumentInfoList = argumentInfoList;
     }
 
-    public JavaDocArgumentInfo getReturnInfo() {
+    public JavaDocReturnInfo getReturnInfo() {
         return returnInfo;
     }
 
-    public void setReturnInfo(JavaDocArgumentInfo returnInfo) {
+    public void setReturnInfo(JavaDocReturnInfo returnInfo) {
         this.returnInfo = returnInfo;
     }
 }

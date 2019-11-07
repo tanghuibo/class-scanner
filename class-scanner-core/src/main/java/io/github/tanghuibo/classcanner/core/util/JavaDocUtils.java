@@ -7,11 +7,11 @@ import io.github.tanghuibo.classcanner.core.bean.JavaDocInfo;
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
+ * JavaDoc工具
  * @author tanghuibo
  * @date 19-11-7上午12:00
  */
