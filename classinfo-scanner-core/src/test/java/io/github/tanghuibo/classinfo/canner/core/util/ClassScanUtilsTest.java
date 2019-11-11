@@ -9,6 +9,7 @@ import io.github.tanghuibo.classinfo.canner.core.util.testdata.TestAnnotationCla
 import io.github.tanghuibo.classinfo.canner.core.util.testdata.TestMethodAnnotation;
 import io.github.tanghuibo.classinfo.canner.core.util.testdata.TestParamAnnotation;
 import io.github.tanghuibo.classinfo.canner.core.util.testdata.TestTypeAnnotation;
+import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.File;
@@ -49,6 +50,10 @@ public class ClassScanUtilsTest {
         System.out.println(JSON.toJSONString(list));
     }
 
+    /**
+     * 测试读取是否正确
+     * @see TestAnnotationClass#test(String, String, String, String, String)
+     */
     @Test
     public void annotationTest() {
         ClassScanUtils classScanUtils = new ClassScanUtils(new ClassInfoUtils());
@@ -57,33 +62,33 @@ public class ClassScanUtilsTest {
         ClassInfo classInfo = list.stream().filter(item ->
                 TestAnnotationClass.class.getCanonicalName().equals(item.getType())).findFirst().orElse(null);
 
-        assert classInfo != null;
+        Assert.assertNotNull(classInfo);
         AnnotationInfo typeAnnotationInfo
                 = classInfo.getAnnotationInfoList().stream().filter(item -> TestTypeAnnotation.class.getCanonicalName().equals(item.getType()))
                 .findFirst().orElse(null);
 
-        assert "testClass".equals(typeAnnotationInfo.getParamMap().get("value"));
+        Assert.assertEquals("testClass", typeAnnotationInfo.getParamMap().get("value"));
 
         List<MethodInfo> methodInfoList = classInfo.getMethodInfoList();
-        assert  methodInfoList != null;
+        Assert.assertNotNull(methodInfoList);
         MethodInfo targetMethodInfo
                 = methodInfoList.stream().filter(methodInfo -> "test".equals(methodInfo.getName())).findFirst().orElse(null);
 
         AnnotationInfo methodAnnotationInfo
                 = targetMethodInfo.getAnnotationInfoList().stream().filter(item -> TestMethodAnnotation.class.getCanonicalName().equals(item.getType()))
                 .findFirst().orElse(null);
-        assert "testMethod".equals(methodAnnotationInfo.getParamMap().get("value"));
+        Assert.assertEquals("testMethod", methodAnnotationInfo.getParamMap().get("value"));
 
         ArgumentInfo argumentInfo1 = targetMethodInfo.getArgumentInfoList().get(1);
         AnnotationInfo paramAnnotationInfo1
                 = argumentInfo1.getAnnotationInfoList().stream().filter(item -> TestParamAnnotation.class.getCanonicalName().equals(item.getType()))
                 .findFirst().orElse(null);
-        assert "arg1".equals(paramAnnotationInfo1.getParamMap().get("value"));
+        Assert.assertEquals("arg1", paramAnnotationInfo1.getParamMap().get("value"));
         ArgumentInfo argumentInfo3 = targetMethodInfo.getArgumentInfoList().get(3);
         AnnotationInfo paramAnnotationInfo3
                 = argumentInfo3.getAnnotationInfoList().stream().filter(item -> TestParamAnnotation.class.getCanonicalName().equals(item.getType()))
                 .findFirst().orElse(null);
-        assert "arg3".equals(paramAnnotationInfo3.getParamMap().get("value"));
+        Assert.assertEquals("arg3", paramAnnotationInfo3.getParamMap().get("value"));
         System.out.println(JSON.toJSONString(list));
     }
 }
