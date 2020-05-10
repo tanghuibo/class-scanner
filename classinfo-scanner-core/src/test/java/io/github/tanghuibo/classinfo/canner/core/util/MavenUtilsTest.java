@@ -30,7 +30,7 @@ public class MavenUtilsTest {
         classInfoUtils.addBeforeFilter(item -> Modifier.isPublic(item.getModifiers()));
         ClassScanUtils classScanUtils = new ClassScanUtils(classInfoUtils);
         List<ClassInfo> scan = classScanUtils.scan( MavenUtils.getClassPaths(MavenUtils.getAllModules(BASE_CLASS)));
-        OutputStream outputStream = new FileOutputStream((BASE_CLASS.endsWith(File.separator) ? BASE_CLASS : BASE_CLASS + File.separator) + "javaDoc.json");
+        OutputStream outputStream = new FileOutputStream(BASE_CLASS + "classInfo.json");
         PrintStream printStream = new PrintStream(outputStream);
         printStream.print(JSON.toJSONString(scan, SerializerFeature.PrettyFormat));
         System.out.println(JSON.toJSONString(scan));

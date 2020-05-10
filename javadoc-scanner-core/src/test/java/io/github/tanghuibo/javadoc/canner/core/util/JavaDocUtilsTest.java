@@ -1,12 +1,13 @@
 package io.github.tanghuibo.javadoc.canner.core.util;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import io.github.tanghuibo.classcanner.javadoc.core.bean.JavaDocInfo;
 import io.github.tanghuibo.classcanner.javadoc.core.util.JavaDocUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.io.File;
+import java.io.*;
 import java.util.List;
 
 /**
@@ -15,17 +16,24 @@ import java.util.List;
  */
 public class JavaDocUtilsTest {
 
-    private String SOURCE_PATH = ".." + File.separator
+    private static final String BASE_CLASS = ".." + File.separator;
+
+    private final String SOURCE_PATH = BASE_CLASS
             + "javadoc-scanner-core"+ File.separator
             + "src"+ File.separator
             + "main" + File.separator
             + "java" + File.separator;
 
+
+
     @Test
-    public void scan() {
+    public void scan() throws FileNotFoundException {
         List<JavaDocInfo> javaDocInfoList = JavaDocUtils.scan(SOURCE_PATH);
-        System.out.println(JSON.toJSONString(javaDocInfoList));
         Assert.assertNotNull(javaDocInfoList);
         Assert.assertNotEquals(javaDocInfoList.size(), 0);
+        OutputStream outputStream = new FileOutputStream(BASE_CLASS + "javaDoc.json");
+        PrintStream printStream = new PrintStream(outputStream);
+        printStream.print(JSON.toJSONString(javaDocInfoList, SerializerFeature.PrettyFormat));
+        System.out.println(JSON.toJSONString(javaDocInfoList));
     }
 }

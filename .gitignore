@@ -6,3 +6,7 @@
 .idea
 *.iml
 
+classinfo-scanner-core/target/
+javadoc-scanner-core/target/
+javaDoc.json
+classInfo.json

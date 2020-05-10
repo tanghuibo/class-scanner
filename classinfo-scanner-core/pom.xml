@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>io.github.tanghuibo</groupId>
-    <artifactId>class-scanner-core</artifactId>
+    <artifactId>classinfo-scanner-core</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
